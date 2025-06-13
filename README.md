@@ -63,7 +63,13 @@ A curated collection of questions and hands-on practice materials for preparing 
 3. Contribute by submitting new questions, solutions, or resources via pull requests.
 
 ## Contributing
-Contributions are welcome! Please open an issue or submit a pull request if you'd like to add new material or improve existing content.
+Contributions are welcome! To contribute:
+
+1. Fork this repository and create a new branch.
+2. Add your questions, answers, or improvements to the relevant file (see the `questions/` directory).
+3. Follow the provided question template for consistency.
+4. Commit your changes and open a pull request.
+5. For detailed guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 This repository is licensed under the MIT License. See [LICENSE](LICENSE) for details.
