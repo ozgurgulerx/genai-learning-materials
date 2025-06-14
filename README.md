@@ -36,24 +36,26 @@ A curated collection of questions and hands-on practice materials for preparing 
 ## Repository Structure
 ```text
 📁 genai-learning-materials/
-├── questions/
-│   ├── system_design.md
-│   ├── coding.md
-│   ├── theory.md
-│   └── product_thinking.md
-├── practice/
-│   ├── coding_challenges/
-│   └── system_design_exercises/
-├── study_guides/
-│   ├── ml_basics.md
-│   ├── llm_concepts.md
-│   └── genai_overview.md
-├── assets/
-│   └── diagrams/
-├── CONTRIBUTING.md
-├── LICENSE
-└── README.md
+└── questions/
+    ├── 00–09_*   # Foundations (Transformer & LLM theory)
+    ├── 10–19_*   # Training & Alignment (RLHF, DPO, etc.)
+    ├── 20–29_*   # Reasoning & Retrieval (Reasoning models, RAG)
+    ├── 30–39_*   # Tool / Agent Protocols (MCP, A2A)
+    ├── 40–49_*   # Product & Strategy (GenAI product thinking)
+    └── 50–59_*   # Safety & Security (AI safety, red-team)
 ```
+
+### Naming Convention
+Each filename begins with a two-digit prefix that groups related topics so they sort together naturally:
+
+* **00–09 Foundations** – core Transformer & LLM theory
+* **10–19 Training & Alignment** – RLHF, DPO …
+* **20–29 Reasoning & Retrieval** – chain-of-thought, RAG
+* **30–39 Tool / Agent Protocols** – MCP, Google A2A
+* **40–49 Product & Strategy** – GenAI product thinking
+* **50–59 Safety & Security** – model safety, red-teaming
+
+Sparse numbering leaves room for future files (e.g., `23_rag_multimodal.md`) without renaming the rest.
 
 > _Tip: Add your own topics and expand the structure as needed!_
 

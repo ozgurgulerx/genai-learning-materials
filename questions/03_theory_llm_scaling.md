@@ -56,6 +56,44 @@ In short, LLMs are colossal yet carefully engineered Transformers whose power de
 
 ---
 
+### Q: In Large Language Models, what are logits, how are they computed, and how are they manipulated during decoding (e.g., temperature scaling, logit bias, token banning)? Provide both an intuitive overview and deeper mathematical details.
+
+**Category:** Theory  
+**Difficulty:** Medium  
+**Tags:** Logits, Softmax, Temperature, Logit Bias, Decoding
+
+**Sample Answer:**
+**High-Level Intuition**  
+Logits are the raw, unnormalized scores a model assigns to every token before converting them to probabilities. They represent how “confident” the model is in each token at that step.
+
+**Where Do Logits Come From?**  
+After the final Transformer layer, the hidden state for position *t* (`hₜ ∈ ℝ^{d_model}`) is projected onto the vocabulary via the output matrix `W_out ∈ ℝ^{V×d_model}` (often tied to the input embeddings) and bias `b`:
+
+```
+logitsₜ = W_out · hₜ + b      # Shape: (V,)
+```
+where *V* is vocabulary size (e.g., 50 k).
+
+**From Logits to Probabilities**
+
+```
+pₜ = softmax(logitsₜ) = exp(logitsₜ) / Σ exp(logitsₜ)
+```
+
+**Manipulating Logits During Decoding**
+1. **Temperature Scaling (τ):**  Divide logits by τ before softmax. τ < 1 sharpens distribution; τ > 1 flattens it.
+2. **Logit Bias / Additions:**  Add vector δ to boost or suppress specific tokens; δ = −∞ bans a token.
+3. **Repetition & Presence Penalties:** Lower logits of tokens already generated to reduce loops.
+4. **Top-k / Top-p Filtering:** Mask out all but the top-k or nucleus set before sampling.
+5. **Typical & Top-a Sampling:** Further schemes modify logits based on entropy or annealing.
+
+**Why Understanding Logits Matters**
+• All decoding tricks ultimately modify logits—mastering them lets you fine-tune generation without retraining.  
+• Logit “lenses” can inspect intermediate layers for interpretability.  
+• Hard constraints (forcing special tokens) are implemented by direct logit manipulation.
+
+---
+
 ### Q: What decoding hyperparameters (e.g., temperature, top-k, top-p/nucleus sampling, repetition penalty) control text generation in LLMs, and how do they affect diversity and coherence? Provide explanations that deepen progressively.
 
 **Category:** Theory  
