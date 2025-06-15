@@ -257,3 +257,128 @@ Organized into six competency areas that align with typical AWS leadership asses
 
 15. **Open-Source Disruption:** “Which open-source or frontier-model trend do you believe will most disrupt AWS GenAI services in the next two years, and how should AWS respond?”
 16. **$10 M Accelerator:** “If given $10 M and six months, what accelerators would you build inside the GenAI Innovation Center to speed customer time-to-value?”
+
+---
+
+## 7. Regional & Strategy Deep-Dive
+
+17. **Sovereignty Architecture:** “A UAE bank mandates that all training data **and** model weights stay in-country. Architect a compliant Bedrock/SageMaker solution.”
+
+**Sample Answer:**  
+1. **Region choice:** Deploy in me-central-1 (UAE) to satisfy residency.  
+2. **Model:** Use BYO open-weight model container on **SageMaker**, not Bedrock managed FM (weights external). Store checkpoints in S3 with **SSE-KMS** and bucket policy denying cross-region PUT.  
+3. **Training:** SageMaker private VPC, network isolation + no Internet.  
+4. **Serving:** Async inference endpoints behind NLB inside same VPC; expose via PrivateLink to bank VPC.  
+5. **Audit:** Enable CloudTrail + AWS Config, CIS benchmark; share logs with bank SIEM.  
+6. **Key control:** Customer-managed KMS keys with `key origin=external` HSM import.  
+7. **Fallback:** For Bedrock value-adds (Guardrails, Agents) deploy **bedrock-runtime-local** pattern via ECS in VPC.  
+→ Meets residency, encryption, and isolation requirements while preserving AWS managed ops.
+
+---
+
+19. **FinOps Guardrails:** “GenAI PoCs can explode the AWS bill. Outline the FinOps controls you’d institute from day 1 to prevent cost surprises.”
+
+**Sample Answer:**  
+• **Budget & Alerts:** Set AWS Budgets at 110 % of estimate with SNS alerts to Slack + email.  
+• **Tagging:** Enforce `CostCenter`, `Project`, `Env` via SCP + Tag Policies.  
+• **Sandbox Accounts:** Separate PoC in its own OU with `ec2:InstanceType` allow-list (g5.xlarge only) and default stop at 19:00 via Instance Scheduler.  
+• **Provisioned-throughput:** For Bedrock, start on On-Demand; move to Provisioned TPS only after usage baselined to lock cost.  
+• **SageMaker Savings:** Use **SageMaker Studio notebooks** with idle-timeout + G5 Spot for experimentation; Spin down training jobs after completion.  
+• **Dashboard:** QuickSight FinOps dash showing $/token, GPU-hours, P90 latency vs spend.  
+• **Continuous Optimisation:** Weekly review, look for unattached EBS, large S3 versions, DLAMI zombies.
+
+---
+
+20. **Change-Management Playbook:** “Draft a 90-day plan to roll out a GenAI knowledge assistant to 3 000 employees of a Gulf telco and ensure sustained adoption.”
+
+**Sample Answer (High-Level):**  
+**Day 0-14 – Discovery & Champion Network**: Identify 15 change champions across business units; run use-case workshops to prioritise top FAQs; finalise success metrics (daily active users, average session length).  
+**Day 15-30 – Pilot (150 users):** Deploy Bedrock RAG assistant behind SSO; capture click-stream + thumbs ratings; daily stand-ups for feedback; refine prompts.  
+**Day 31-60 – Enablement Sprint:** Create micro-learning videos (<3 min), integrate assistant shortcut into MS Teams; run “Ask-Me-Anything” roadshows; publish weekly adoption dashboard to execs.  
+**Day 61-90 – Scale & Optimise:** Roll out to full 3 000 staff; introduce gamified badges for power users; set up continuous EvalOps loop (random answer audit); quarterly retraining cadence. Target 60 % DAU and CSAT > 4.5/5 by day 90.
+
+---
+
+21. **Competitive Rebuttal:** “The customer leans toward Microsoft due to O365 Copilot. Craft a three-point rebuttal positioning AWS Bedrock.”
+
+**Sample Answer (Talk Track):**  
+1. **Model Choice & Future-Proofing:** Bedrock offers *multiple* top-tier FMs (Anthropic, Cohere, Meta, AWS Titan). Avoid vendor lock-in to a single model roadmap.  
+2. **Data Control & Privacy:** Bedrock processes prompts with encryption, no data used for training; choose VPC-only endpoints + KMS—critical for GCC compliance. Copilot routes through Microsoft 365 cloud with less granularity.  
+3. **End-to-End Builders’ Toolkit:** Bedrock integrates with SageMaker, Kendra, and AWS native services (Step Functions, Lambda) enabling industrial-grade, custom GenAI apps beyond Office documents—fits telco’s omni-channel roadmap.  
+Close by offering PoC to quantify incremental value vs Copilot uplift.
+
+---
+
+22. **Responsible-AI Hotfix:** “During a live demo, a Bedrock chatbot outputs culturally insensitive Arabic content. Walk through your immediate triage and long-term remediation plan.”
+
+**Sample Answer:**  
+• **Immediate:** Apologise, stop generation, and disable offending session; capture request/response IDs.  
+• **Triage (H1):** Pull CloudWatch logs; confirm model/version + guardrail policy; reproduce with same prompt; open Sev-2 with Bedrock support.  
+• **Short-Term Fix (24 h):** Add regex + semantic filters to Guardrails blocklist; retrain embedding retriever to boost cultural context docs; enable human review for Arabic outputs >500 chars.  
+• **Root-Cause Analysis:** Conduct bias evaluation using Arabic cultural sensitivity checklist; map bias source (training data vs prompt).  
+• **Long-Term:** Implement continuous offline red-team testing for Arabic dialects; schedule quarterly ethics review board with local cultural experts; publish incident post-mortem to client.
+
+---
+
+23. **Multimodal RAG Design:** “Design a multimodal system on AWS that answers Arabic voice queries with cited text **and** images.”
+
+**Sample Answer (Architecture):**  
+1. **Input Layer:** Amazon Transcribe Arabic STT → text.  
+2. **Retrieval:** Use Kendra + multimodal vector store (OpenSearch w/ k-NN) storing both document embeddings (text) and image embeddings (Titan Image Embed).  
+3. **RAG Generation:** Bedrock LLM (e.g., Anthropic Claude 3) with system prompt instructing grounded citations; pass retrieved text chunks + presigned S3 links to images.  
+4. **Voice/Display Out:** Render Markdown with image previews on web/mobile; optional Polly NTTS Arabic to read answer.  
+5. **Feedback Loop:** Cognito-auth users rate relevance; store in DynamoDB for retriever re-ranking.  
+6. **Latency Optimisation:** Cache embeddings in RDS Proxy; use Lambda for orchestration; all in me-central-1.
+
+---
+
+24. **Dialect Fine-Tuning:** “What unique challenges arise when fine-tuning LLMs for Gulf Arabic dialects? Propose data-collection and evaluation methods.”
+
+**Sample Answer:**  
+**Challenges:**  
+• Scarcity of high-quality labelled dialect data; heavy code-switching (Arabic/English).  
+• Multiple dialect variants (Emirati, Saudi, Kuwaiti) with unique orthography.  
+• Lack of standard benchmarks.  
+**Data Collection:**  
+• Crawl public social media with geo-filters; partner with local media houses for transcripts; crowd-source via Amazon MTurk with region filters.  
+• Apply automatic diacritisation + language ID tagging to clean.  
+**Fine-Tuning Approach:**  
+• Use LoRA on Arabic-centric model (e.g., AraGPT) in SageMaker. Mix dialect data 30 % with MSA 70 % to retain grammar.  
+**Evaluation:**  
+• Create dialect QA dev set; use BLEU + COMET plus human eval by native speakers.  
+• Track code-switch detection F1.  
+**Governance:** Ensure anonymisation per UAE PDPL; include cultural sensitivity rubric.
+
+---
+
+25. **Leadership-Principle Hybrid:** “Tell me about a high-pressure engagement where you had to **Think Big**, **Dive Deep**, and still **Deliver Results** in under two weeks.”
+
+**Sample Answer (STAR):**  
+• **Situation:** Saudi telco CEO requested GenAI network-trouble-ticket assistant demo for board in 12 days.  
+• **Task:** Deliver working prototype with measurable latency <2 s.  
+• **Action:**  
+   – *Think Big:* Framed vision of multilingual voice + text assistant integrated with OSS/BSS.  
+   – *Dive Deep:* Profiled existing ticket taxonomy; wrote Python script to generate synthetic edge-case tickets; fine-tuned Claude-Instant via LoRA to 93 % intent accuracy.  
+   – *Bias for Action:* Spun up cross-functional tiger team; daily stand-ups; used Step Functions for glue code.  
+• **Result:** Demo hit 1.6 s P90 latency, 95 % ticket classification accuracy; CEO approved $4 M pilot budget. Won AWS “Think Big” award Q3.
+
+---
+
+26. **Bar-Raiser Case:** “You have 90 days to help a Dubai airline cut call-centre costs 30 % using GenAI. Draft the day-0 → day-90 plan: business case, architecture, KPIs.”
+
+**Sample Answer (Milestone View):**  
+**Day 0-10 – Discovery & Baseline**  
+• Analyse IVR logs, top 20 intents; current AHT 6 min, volume 1 M calls/mo, cost $0.8/call.  
+• Stakeholder workshop; define success: 30 % deflection to self-service.  
+**Day 11-30 – PoC**  
+• Build Bedrock chatbot (RAG over booking policies + FAQ) in English + Arabic; integrate with Amazon Connect sandbox; pilot with 5 % traffic.  
+• KPI targets: 60 % containment, CSAT ≥ 4/5, latency <3 s.  
+**Day 31-60 – Pilot Expansion**  
+• Add voice via Lex + Polly; connect to booking API via Bedrock Agents; expand to 25 % traffic.  
+• Implement EvalOps loop; weekly tuning.  
+**Day 61-90 – Production & Optimisation**  
+• Roll out 80 % traffic; enable fallback to human agent on sentiment <-0.3 (Comprehend).  
+• Cost model: projected 0.5 M calls deflected × $0.8 = $400 k/mo saved; GenAI infra $70 k/mo → net 30 % reduction.  
+• Handover SOPs, FinOps dashboard, and training to airline ops team.
+
+---
